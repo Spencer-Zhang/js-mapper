@@ -1,5 +1,15 @@
 $(function() {
+  var display = new Display();
+
   $('.cell').click(function() {
-    $(this).css('background-color', 'black');
+    cellIndex = $(this).index();
+    display.setColor(cellIndex, "black");
   })
 })
+
+
+function Display() {
+  this.setColor = function(cellIndex, color) {
+    $('.cell').eq(cellIndex).css("background-color", color);
+  }
+}
