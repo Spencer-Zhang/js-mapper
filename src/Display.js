@@ -1,6 +1,7 @@
 function Display() {
   this.drawGraph = function(graph) {
     this.clear();
+    var self = this;
 
     var svg = d3.select("body")
       .append("svg")
@@ -21,10 +22,18 @@ function Display() {
         .attr("y", function(d, i) { return 50*Math.floor(i/10) })
         .attr('stroke', 'gray')
         .attr('stroke-width', '1')
-        .attr('fill', graph.getCellColor);
+        .attr('fill', function(d, i) { return getCellColor(graph, i); });
   }
 
   this.clear = function() {
     $('body').text('');
+  }
+
+  function getCellColor(graph, i) {
+    var cellType = graph.getCellType(i);
+    if(cellType === "wall")        {return "black"};
+    if(cellType === "area")        {return "red"};
+    if(cellType === "connection")  {return "blue"};
+    if(cellType === "blank")       {return "white"};
   }
 }

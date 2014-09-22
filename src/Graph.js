@@ -29,16 +29,23 @@ function Graph() {
 
   var self = this;
 
-  this.getCellColor = function(d, i) {
-    if(self.graph[i] === true) { return "black"; }
-    for(var areaIndex in self.areas) {
-      var area = self.areas[areaIndex];
-      if(area.containsCell(i)) { return "red"; }
+  this.getCellType = function(i) {
+    var areaIndex, area;
+    if(self.graph[i] === true) { return "wall"; }
+    for(areaIndex in self.areas) {
+      area = self.areas[areaIndex];
+      if(area.containsCell(i)) { return "area"; }
     }
-    for(var areaIndex in self.connections) {
-      var area = self.connections[areaIndex];
-      if(area.containsCell(i)) { return "blue"; }
+    for(areaIndex in self.connections) {
+      area = self.connections[areaIndex];
+      if(area.containsCell(i)) { return "connection"; }
     }
-    return "white";  
+    return "blank";  
+  }
+
+  this.generateAreas = function() {
+
+
+
   }
 }
