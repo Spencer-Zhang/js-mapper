@@ -34,26 +34,30 @@ function Graph() {
     if(i < 0 && i > 99) { return "wall"; }
 
     if(self.graph[i] === true) { return "wall"; }
-    for(areaIndex in self.areas) {
-      area = self.areas[areaIndex];
-      if(area.containsCell(i)) { return "area"; }
-    }
     for(areaIndex in self.connections) {
       area = self.connections[areaIndex];
       if(area.containsCell(i)) { return "connection"; }
+    }
+    for(areaIndex in self.areas) {
+      area = self.areas[areaIndex];
+      if(area.containsCell(i)) { return "area"; }
     }
     return "blank";  
   }
 
   this.generateAreas = function() {
-    var i, area
+    var i, area, connections
     this.areas = [];
+    this.connections = [];
 
-    // while(findBlankSpace() !== false) {
+    while(findBlankSpace() !== false) {
       i = findBlankSpace();
       area = findLargestBlankArea(i);
       this.areas.push(area);
-    // }
+      this.connections = this.connections.concat(testForConnections(area));
+    }
+
+    console.log(this.connections);
   }
 
   function findBlankSpace() {
@@ -91,6 +95,35 @@ function Graph() {
   function canExtendDown(area) {
     for(var tx = area.x1; tx < area.x2; tx++ ) {
       if(self.getCellType(tx + 10*area.y2) !== "blank") {return false;}
+    }
+    return true;
+  }
+
+  function testForConnections(area) {
+    var testArea;
+    var connections = [];
+    if(area.x1 > 0) {
+      newArea = new Area(area.x1-1, area.y1, area.x1, area.y2)
+      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
+    }
+    if(area.x2 < 10) {
+      newArea = new Area(area.x2, area.y1, area.x2+1, area.y2)
+      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
+    }
+    if(area.y1 > 0) {
+      newArea = new Area(area.x1, area.y1-1, area.x2, area.y1)
+      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
+    }
+    if(area.y2 < 10) {
+      newArea = new Area(area.x1, area.y2, area.x2, area.y2+1)
+      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
+    }
+    return connections;
+  }
+
+  function areaOnlyContains(area, cellType) {
+    for(var i = 0; i < 100; i++) {
+      if(area.containsCell(i) && self.getCellType(i) !== cellType) {return false;}
     }
     return true;
   }
