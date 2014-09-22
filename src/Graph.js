@@ -138,25 +138,58 @@ function Graph() {
   }
 
   function testForConnections(area) {
-    var testArea;
+    var newArea;
     var connections = [];
-    if(area.x1 > 0) {
-      newArea = new Area(area.x1-1, area.y1, area.x1, area.y2)
-      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
+
+    var x = area.x1-1
+    var y = area.y1
+
+    if(area.x1 > 0) { //Test Left
+      connections = connections.concat(findVerticalConnections(area.x1-1, area.y1, area.y2));
     }
-    if(area.x2 < self.width) {
-      newArea = new Area(area.x2, area.y1, area.x2+1, area.y2)
-      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
-    }
+    if(area.x2 < self.width) { //Test Right
+      connections = connections.concat(findVerticalConnections(area.x2, area.y1, area.y2));
+    } 
+
     if(area.y1 > 0) {
-      newArea = new Area(area.x1, area.y1-1, area.x2, area.y1)
-      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
+      connections = connections.concat(findHorizontalConnections(area.y1-1, area.x1, area.x2));
     }
     if(area.y2 < self.height) {
-      newArea = new Area(area.x1, area.y2, area.x2, area.y2+1)
-      if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
-    }
+      connections = connections.concat(findHorizontalConnections(area.y2, area.x1, area.x2));
+    } 
     return connections;
+  }
+
+  function findVerticalConnections(x, yTop, yBottom) {
+    var connections = [];
+    var newArea;
+    for(y = yTop; y < yBottom; y++) {
+      if(self.getCellType(x + self.width* y) === "area") {
+        if(newArea) {newArea.y2 += 1;}
+        else { 
+          newArea = new Area(x, y, x+1, y+1); 
+          connections.push(newArea);
+        }
+      }
+      else { newArea = undefined; }
+    }
+    return connections
+  }
+
+  function findHorizontalConnections(y, xLeft, xRight) {
+    var connections = [];
+    var newArea;
+    for(x = xLeft; x < xRight; x++) {
+      if(self.getCellType(x + self.width* y) === "area") {
+        if(newArea) {newArea.x2 += 1;}
+        else { 
+          newArea = new Area(x, y, x+1, y+1); 
+          connections.push(newArea);
+        }
+      }
+      else { newArea = undefined; }
+    }
+    return connections
   }
 
   function areaOnlyContains(area, cellType) {
