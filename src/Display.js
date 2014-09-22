@@ -42,13 +42,15 @@ function Display() {
       .attr("fill", "yellow");
 
 
-    d3.select('#paths').selectAll('circle')
-    .data(graph.connections).enter()
-    .append("circle")
-      .attr("cx", function(d, i) { return (500/graph.width) * d.center()[0] })
-      .attr("cy", function(d, i) { return (500/graph.height) * d.center()[1] })
-      .attr("r", 5)
-      .attr("fill", "white");
+    d3.select('#paths').selectAll('line')
+    .data(graph.getLinks()).enter()
+    .append("line")
+      .attr("x1", function(d, i) { return (500/graph.width) * d[0].center()[0] })
+      .attr("y1", function(d, i) { return (500/graph.height) * d[0].center()[1] })
+      .attr("x2", function(d, i) { return (500/graph.width) * d[1].center()[0] })
+      .attr("y2", function(d, i) { return (500/graph.height) * d[1].center()[1] })
+      .attr("stroke", "white")
+      .attr("stroke-width", "1");
   }
 
   this.clear = function() {

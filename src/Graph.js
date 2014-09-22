@@ -82,6 +82,22 @@ function Graph() {
     }
   }
 
+  this.getLinks = function() {
+    var links = [];
+    for(i in this.nodes) {
+      var node = this.nodes[i];
+      for(j in node.paths) {
+        var path = node.paths[j];
+        links.push([node.area, path])
+      }
+    }
+    return links
+  }
+
+
+
+
+
   function findBlankSpace() {
     for(var index = 0; index < self.width*self.height; index++) {
       if(self.getCellType(index) === "blank") { return index }
