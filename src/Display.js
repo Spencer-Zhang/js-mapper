@@ -60,7 +60,7 @@ function Display() {
   function getCellColor(graph, i) {
     var cellType = graph.getCellType(i);
     if(cellType === "wall")        {return "black"};
-    if(cellType === "area")        {return "red"};
+    if(cellType === "area")        {return "blue"};
     if(cellType === "connection")  {return "blue"};
     if(cellType === "blank")       {return "white"};
   }
