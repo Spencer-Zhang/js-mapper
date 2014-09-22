@@ -31,6 +31,8 @@ function Graph() {
 
   this.getCellType = function(i) {
     var areaIndex, area;
+    if(i < 0 && i > 99) { return "wall"; }
+
     if(self.graph[i] === true) { return "wall"; }
     for(areaIndex in self.areas) {
       area = self.areas[areaIndex];
@@ -44,8 +46,52 @@ function Graph() {
   }
 
   this.generateAreas = function() {
+    var i, area
+    this.areas = [];
 
+    // while(findBlankSpace() !== false) {
+      i = findBlankSpace();
+      area = findLargestBlankArea(i);
+      this.areas.push(area);
+    // }
+  }
 
+  function findBlankSpace() {
+    for(var index = 0; index < 100; index++) {
+      if(self.getCellType(index) === "blank") { return index }
+    }
+    return false;
+  }
 
+  function findLargestBlankArea(i) {
+    var x1 = i%10;
+    var y1 = Math.floor(i/10);
+    var x2 = x1 + 1, y2 = y1 + 1;
+    var tx, ty;
+    var area = new Area(x1, y1, x2, y2)
+
+    while(area.x2 % 10 != 0 && canExtendRight(area)) {
+      area.x2 += 1;
+    }
+
+    while(area.y2 < 10 && canExtendDown(area)) {
+      area.y2 += 1
+    }
+
+    return area;
+  }
+
+  function canExtendRight(area) {
+    for(var ty = area.y1; ty < area.y2; ty++ ) {
+      if(self.getCellType(area.x2 + 10*ty) !== "blank") {return false;}
+    }
+    return true;
+  }
+
+  function canExtendDown(area) {
+    for(var tx = area.x1; tx < area.x2; tx++ ) {
+      if(self.getCellType(tx + 10*area.y2) !== "blank") {return false;}
+    }
+    return true;
   }
 }

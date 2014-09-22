@@ -4,14 +4,14 @@ $(function() {
 
   var sample = [];
 
-  graph.areas.push(new Area(0, 0, 3, 3));
-  graph.connections.push(new Area(3, 3, 6, 6));
-  graph.graph[99] = true;
+  graph.graph[79] = true;
+  graph.generateAreas();
 
   display.drawGraph(graph);
 
   $("body").on('click', '#cells rect', function() {
     graph.graph[$(this).index()] = !graph.graph[$(this).index()];
+    graph.generateAreas();
     display.drawGraph(graph);
   })
 })
