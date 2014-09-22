@@ -164,7 +164,7 @@ function Graph() {
     var connections = [];
     var newArea;
     for(y = yTop; y < yBottom; y++) {
-      if(self.getCellType(x + self.width* y) === "area") {
+      if(self.getCellType(x + self.width* y) === "area" || self.getCellType(x + self.width* y) === "connection") {
         if(newArea) {newArea.y2 += 1;}
         else { 
           newArea = new Area(x, y, x+1, y+1); 
@@ -180,7 +180,7 @@ function Graph() {
     var connections = [];
     var newArea;
     for(x = xLeft; x < xRight; x++) {
-      if(self.getCellType(x + self.width* y) === "area") {
+      if(self.getCellType(x + self.width* y) === "area" || self.getCellType(x + self.width* y) === "connection") {
         if(newArea) {newArea.x2 += 1;}
         else { 
           newArea = new Area(x, y, x+1, y+1); 
