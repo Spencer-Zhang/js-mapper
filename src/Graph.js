@@ -22,17 +22,24 @@ function Area(x1, y1, x2, y2) {
 
 
 
+function Node(area) {
+  this.paths = []
+  this.area = area;
+}
+
+
+
 function Graph() {
   this.width = 10;
   this.height = 10;
   this.graph = Array(this.width * this.height);
-  this.areas = [];
   this.connections = [];
+  this.nodes = [];
 
   var self = this;
 
   this.getCellType = function(i) {
-    var areaIndex, area;
+    var nodeIndex, area;
     if(i < 0 || i >= self.width*self.height) { return "wall"; }
 
     if(self.graph[i] === true) { return "wall"; }
@@ -40,23 +47,38 @@ function Graph() {
       area = self.connections[areaIndex];
       if(area.containsCell(i, this)) { return "connection"; }
     }
-    for(areaIndex in self.areas) {
-      area = self.areas[areaIndex];
+    for(nodeIndex in self.nodes) {
+      area = self.nodes[nodeIndex].area;
       if(area.containsCell(i, this)) { return "area"; }
     }
     return "blank";  
   }
 
+  this.getCellNode = function(i) {
+    for(node in this.nodes) {
+      if(this.nodes[node].area.containsCell(i, this)) { return this.nodes[node]; }
+    }
+  }
+
   this.generateAreas = function() {
-    var i, area, connections
-    this.areas = [];
+    var i, area, connections, node
+    this.nodes = [];
     this.connections = [];
 
     while(findBlankSpace() !== false) {
       i = findBlankSpace();
       area = findLargestBlankArea(i);
-      this.areas.push(area);
-      this.connections = this.connections.concat(testForConnections(area));
+      node = new Node(area);
+      this.nodes.push(node);
+
+      connections = testForConnections(area);
+      for(i in connections) {
+        connection = connections[i];
+        node.paths.push(connection);
+        this.getCellNode(connection.x1 + this.width * connection.y1).paths.push(connection);
+      }
+
+      this.connections = this.connections.concat(connections);
     }
   }
 
