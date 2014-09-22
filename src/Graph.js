@@ -8,10 +8,10 @@ function Area(x1, y1, x2, y2) {
     return [(this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2];
   }
 
-  this.containsCell = function(cellIndex) {
+  this.containsCell = function(cellIndex, graph) {
     var x, y;
-    cellX = cellIndex % 10;
-    cellY = Math.floor(cellIndex / 10);
+    cellX = cellIndex % graph.width;
+    cellY = Math.floor(cellIndex / graph.width);
 
     return (cellX >= this.x1 && 
             cellX < this.x2 && 
@@ -23,7 +23,9 @@ function Area(x1, y1, x2, y2) {
 
 
 function Graph() {
-  this.graph = Array(100);
+  this.width = 10;
+  this.height = 10;
+  this.graph = Array(this.width * this.height);
   this.areas = [];
   this.connections = [];
 
@@ -31,16 +33,16 @@ function Graph() {
 
   this.getCellType = function(i) {
     var areaIndex, area;
-    if(i < 0 && i > 99) { return "wall"; }
+    if(i < 0 || i >= self.width*self.height) { return "wall"; }
 
     if(self.graph[i] === true) { return "wall"; }
     for(areaIndex in self.connections) {
       area = self.connections[areaIndex];
-      if(area.containsCell(i)) { return "connection"; }
+      if(area.containsCell(i, this)) { return "connection"; }
     }
     for(areaIndex in self.areas) {
       area = self.areas[areaIndex];
-      if(area.containsCell(i)) { return "area"; }
+      if(area.containsCell(i, this)) { return "area"; }
     }
     return "blank";  
   }
@@ -56,29 +58,27 @@ function Graph() {
       this.areas.push(area);
       this.connections = this.connections.concat(testForConnections(area));
     }
-
-    console.log(this.connections);
   }
 
   function findBlankSpace() {
-    for(var index = 0; index < 100; index++) {
+    for(var index = 0; index < self.width*self.height; index++) {
       if(self.getCellType(index) === "blank") { return index }
     }
     return false;
   }
 
   function findLargestBlankArea(i) {
-    var x1 = i%10;
-    var y1 = Math.floor(i/10);
+    var x1 = i%self.width;
+    var y1 = Math.floor(i/self.width);
     var x2 = x1 + 1, y2 = y1 + 1;
     var tx, ty;
     var area = new Area(x1, y1, x2, y2)
 
-    while(area.x2 % 10 != 0 && canExtendRight(area)) {
+    while(area.x2 % self.width != 0 && canExtendRight(area)) {
       area.x2 += 1;
     }
 
-    while(area.y2 < 10 && canExtendDown(area)) {
+    while(area.y2 < self.height && canExtendDown(area)) {
       area.y2 += 1
     }
 
@@ -87,14 +87,14 @@ function Graph() {
 
   function canExtendRight(area) {
     for(var ty = area.y1; ty < area.y2; ty++ ) {
-      if(self.getCellType(area.x2 + 10*ty) !== "blank") {return false;}
+      if(self.getCellType(area.x2 + self.width*ty) !== "blank") {return false;}
     }
     return true;
   }
 
   function canExtendDown(area) {
     for(var tx = area.x1; tx < area.x2; tx++ ) {
-      if(self.getCellType(tx + 10*area.y2) !== "blank") {return false;}
+      if(self.getCellType(tx + self.width*area.y2) !== "blank") {return false;}
     }
     return true;
   }
@@ -106,7 +106,7 @@ function Graph() {
       newArea = new Area(area.x1-1, area.y1, area.x1, area.y2)
       if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
     }
-    if(area.x2 < 10) {
+    if(area.x2 < self.width) {
       newArea = new Area(area.x2, area.y1, area.x2+1, area.y2)
       if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
     }
@@ -114,7 +114,7 @@ function Graph() {
       newArea = new Area(area.x1, area.y1-1, area.x2, area.y1)
       if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
     }
-    if(area.y2 < 10) {
+    if(area.y2 < self.height) {
       newArea = new Area(area.x1, area.y2, area.x2, area.y2+1)
       if(areaOnlyContains(newArea, "area")) {connections.push(newArea)}
     }
@@ -122,8 +122,8 @@ function Graph() {
   }
 
   function areaOnlyContains(area, cellType) {
-    for(var i = 0; i < 100; i++) {
-      if(area.containsCell(i) && self.getCellType(i) !== cellType) {return false;}
+    for(var i = 0; i < self.width * self.height; i++) {
+      if(area.containsCell(i, self) && self.getCellType(i) !== cellType) {return false;}
     }
     return true;
   }
