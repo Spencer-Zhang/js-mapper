@@ -9,3 +9,7 @@
 
   line-height: 0px;
 }
+
+rect {
+  border: 1px solid gray;
+}
