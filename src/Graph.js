@@ -74,8 +74,8 @@ function Graph() {
       connections = testForConnections(area);
       for(i in connections) {
         connection = connections[i];
-        node.paths.push(connection);
         this.getCellNode(connection.x1 + this.width * connection.y1).paths.push(connection);
+        this.getCellNode(connection.x2 - 1 + this.width * (connection.y2-1)).paths.push(connection);
       }
 
       this.connections = this.connections.concat(connections);
@@ -148,14 +148,14 @@ function Graph() {
       connections = connections.concat(findVerticalConnections(area.x1-1, area.y1, area.y2));
     }
     if(area.x2 < self.width) { //Test Right
-      connections = connections.concat(findVerticalConnections(area.x2, area.y1, area.y2));
+      connections = connections.concat(findVerticalConnections(area.x2-1, area.y1, area.y2));
     } 
 
     if(area.y1 > 0) {
       connections = connections.concat(findHorizontalConnections(area.y1-1, area.x1, area.x2));
     }
     if(area.y2 < self.height) {
-      connections = connections.concat(findHorizontalConnections(area.y2, area.x1, area.x2));
+      connections = connections.concat(findHorizontalConnections(area.y2-1, area.x1, area.x2));
     } 
     return connections;
   }
@@ -165,11 +165,14 @@ function Graph() {
     var newArea;
     for(y = yTop; y < yBottom; y++) {
       if(self.getCellType(x + self.width* y) === "area" || self.getCellType(x + self.width* y) === "connection") {
-        if(newArea) {newArea.y2 += 1;}
-        else { 
-          newArea = new Area(x, y, x+1, y+1); 
-          connections.push(newArea);
+        if(self.getCellType(x + 1 + self.width* y) === "area" || self.getCellType(x + 1 + self.width* y) === "connection") {
+          if(newArea) {newArea.y2 += 1;}
+          else { 
+            newArea = new Area(x, y, x+2, y+1); 
+            connections.push(newArea);
+          }
         }
+        else { newArea = undefined; }
       }
       else { newArea = undefined; }
     }
@@ -181,11 +184,14 @@ function Graph() {
     var newArea;
     for(x = xLeft; x < xRight; x++) {
       if(self.getCellType(x + self.width* y) === "area" || self.getCellType(x + self.width* y) === "connection") {
-        if(newArea) {newArea.x2 += 1;}
-        else { 
-          newArea = new Area(x, y, x+1, y+1); 
-          connections.push(newArea);
+        if(self.getCellType(x + self.width* (y+1)) === "area" || self.getCellType(x + self.width* (y+1)) === "connection") {
+          if(newArea) {newArea.x2 += 1;}
+          else { 
+            newArea = new Area(x, y, x+1, y+2); 
+            connections.push(newArea);
+          }
         }
+        else { newArea = undefined; }
       }
       else { newArea = undefined; }
     }
