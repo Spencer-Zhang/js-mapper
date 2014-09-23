@@ -65,20 +65,27 @@ function Graph() {
     this.nodes = [];
     this.connections = [];
 
-    while(findBlankSpace() !== false) {
-      i = findBlankSpace();
-      area = findLargestBlankArea(i);
-      node = new Node(area);
-      this.nodes.push(node);
+    var brushSize = 10;
 
-      connections = testForConnections(area);
-      for(i in connections) {
-        connection = connections[i];
-        this.getCellNode(connection.x1 + this.width * connection.y1).paths.push(connection);
-        this.getCellNode(connection.x2 - 1 + this.width * (connection.y2-1)).paths.push(connection);
+    while(brushSize >= 1) {
+      i = findBlankSpace(brushSize);
+
+      if(i !== undefined) {
+
+        area = findLargestBlankArea(i);
+        node = new Node(area);
+        this.nodes.push(node);
+
+        connections = testForConnections(area);
+        for(i in connections) {
+          connection = connections[i];
+          this.getCellNode(connection.x1 + this.width * connection.y1).paths.push(connection);
+          this.getCellNode(connection.x2 - 1 + this.width * (connection.y2-1)).paths.push(connection);
+        }
+
+        this.connections = this.connections.concat(connections);
       }
-
-      this.connections = this.connections.concat(connections);
+      else { brushSize--; }
     }
   }
 
@@ -98,19 +105,19 @@ function Graph() {
 
 
 
-  function findBlankSpace() {
-    for(var index = 0; index < self.width*self.height; index++) {
-      if(self.getCellType(index) === "blank") { return index }
+  function findBlankSpace(brushSize) {
+    brushSize = brushSize || 1;
+    var testArea;
+    for(var x = 0; x <= self.width - brushSize; x++) {
+      for(var y = 0; y <= self.height - brushSize; y++) {
+        testArea = new Area(x, y, x+brushSize, y+brushSize)
+        if(areaOnlyContains(testArea, "blank")) { return testArea; }
+      }
     }
-    return false;
+    return undefined;
   }
 
-  function findLargestBlankArea(i) {
-    var x1 = i%self.width;
-    var y1 = Math.floor(i/self.width);
-    var x2 = x1 + 1, y2 = y1 + 1;
-    var tx, ty;
-    var area = new Area(x1, y1, x2, y2)
+  function findLargestBlankArea(area) {
 
     while(area.x2 % self.width != 0 && canExtendRight(area)) {
       area.x2 += 1;
